@@ -1,0 +1,12 @@
+2-hr meeting on Friday or Saturday:
+- 30 min: block diagram for single bit & for whole ALU
+- 30 min: write test bench for a bitslice
+- 1 hr or a little more: write a bitslice in Verilog
+
+2-hr meeting on Sunday or Monday
+- 30 min: write test bench for whole 32-bit ALU
+- 1 hr: chain bitslices together in Verilog
+- 30 min: timing analysis
+
+Distribute the report-writing on Monday and Tuesday; done by Tuesday night
+- 1 hr: write report
