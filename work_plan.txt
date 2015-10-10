@@ -1,7 +1,7 @@
 2-hr meeting on Friday or Saturday:
-- 30 min: block diagram for single bit & for whole ALU
-- 30 min: write test bench for a bitslice
-- 1 hr or a little more: write a bitslice in Verilog
+- 30 min: block diagram for single bit & for whole ALU -> took 30 min
+- 30 min: write test bench for a bitslice -> took 15 min
+- 1 hr or a little more: write a bitslice in Verilog -> took 1 hr
 
 2-hr meeting on Sunday or Monday
 - 30 min: write test bench for whole 32-bit ALU
