@@ -16,6 +16,12 @@ module ALU (
     input[31:0]     operandB,
     input[2:0]      command
 );
+
+    wire initialSltKin, initialSltAnsIn;
+    `XNOR(initialSltKin, operandA[31], operandB[31]);
+    `AND(initialSltAnsIn, operandA[31], initialSltKin);
+
+
 endmodule
 
 module bitSlice (
@@ -28,7 +34,8 @@ module bitSlice (
     input[2:0] s,
     input addCarryIn,
     input sltKin,
-    input sltAnsIn
+    input sltAnsIn,
+    input first
 );
 
     wire[7:0] results;
@@ -37,7 +44,7 @@ module bitSlice (
     fullAdder adder(results[0], addCarryout, a, b, addCarryIn);
     `BUF(results[1], results[0]);
     `XOR(results[2], a, b);
-    sltSlice slt(results[3], sltKout, sltAnsOut, sltKin, sltAnsIn, a, b);
+    sltSlice slt(results[3], sltKout, sltAnsOut, sltKin, sltAnsIn, a, b, first);
     `AND(results[4], a, b);
     `NOT(results[5], results[4]);
     `NOT(results[6], results[7]);
@@ -100,15 +107,23 @@ module sltSlice(
     input keepLookingIn,
     input ansIn,
     input a,
-    input b
+    input b,
+    input first
 );
 
     // keepLookingIn=1 if every previous bit pair has been equal.
 
     // Keep looking if A and B are equal and we haven't already stopped looking
-    wire AxnorB;
+    wire AxnorB, logicalKOut;
     `XNOR(AxnorB, a, b);
-    `AND(keepLookingOut, AxnorB, keepLookingIn);
+    `AND(logicalKOut, AxnorB, keepLookingIn);
+
+    // Hand keepLookingIn straight through to keepLookingOut if first block
+    wire notFirst, notFirstCase, firstCase;
+    `NOT(notFirst, first);
+    `AND(notFirstCase, notFirst, logicalKOut);
+    `AND(firstCase, first, keepLookingIn);
+    `OR(keepLookingOut, notFirstCase, firstCase);
 
     // ansOut=1 if A=0 and B=1 and we haven't already stopped looking, or if
     // we already determined ans=1.
@@ -127,13 +142,13 @@ module testBitSlice;
 
     reg a, b;
     reg[2:0] s;
-    reg addCarryIn, sltKin, sltAnsIn;
+    reg addCarryIn, sltKin, sltAnsIn, first;
     wire out;
     wire addCarryout, sltKout, sltAnsOut;
 
 
     bitSlice slice (out, addCarryout, sltKout, sltAnsOut, a, b, s, addCarryIn,
-                    sltKin, sltAnsIn);
+                    sltKin, sltAnsIn, first);
 
     initial begin
         $dumpfile("slice.vcd"); //dump info to create wave propagation later
@@ -226,6 +241,7 @@ module testBitSlice;
         $display("SLT");
         $display("A B Kin AnsIn Selector | KOut AnsOut out | Expected");
         s=3'b011;
+        first=0;
         a=0; b=1; sltKin=1; sltAnsIn=0; #1000
         $display("%b %b %b   %b     %b      | %b    %b      %b   | %b %b %b",
                  a, b, sltKin, sltAnsIn, s, sltKout, sltAnsOut, out, 1'b0, 1'b1, 1'b0);
@@ -235,6 +251,13 @@ module testBitSlice;
         a=1; b=1; sltKin=1; sltAnsIn=0; #1000
         $display("%b %b %b   %b     %b      | %b    %b      %b   | %b %b %b",
                  a, b, sltKin, sltAnsIn, s, sltKout, sltAnsOut, out, 1'b1, 1'b0, 1'b0);
+        a=1'bx; b=1'bx; sltKin=0; sltAnsIn=1; #1000
+        $display("%b %b %b   %b     %b      | %b    %b      %b   | %b %b %b",
+                 a, b, sltKin, sltAnsIn, s, sltKout, sltAnsOut, out, 1'b0, 1'b1, 1'b0);
+        a=1'bx; b=1'bx; sltKin=0; sltAnsIn=0; #1000
+        $display("%b %b %b   %b     %b      | %b    %b      %b   | %b %b %b",
+                 a, b, sltKin, sltAnsIn, s, sltKout, sltAnsOut, out, 1'b0, 1'b0, 1'b0);
+        first=1;
         a=1'bx; b=1'bx; sltKin=0; sltAnsIn=1; #1000
         $display("%b %b %b   %b     %b      | %b    %b      %b   | %b %b %b",
                  a, b, sltKin, sltAnsIn, s, sltKout, sltAnsOut, out, 1'b0, 1'b1, 1'b0);
