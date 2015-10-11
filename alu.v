@@ -3,6 +3,7 @@
 `define NOT not #50
 `define OR or #50
 `define XOR xor #50
+`define XNOR xnor #50
 `define BUF buf #50
 
 
@@ -19,20 +20,24 @@ endmodule
 
 module bitSlice (
     output out,
-    output carryout,
+    output addCarryout,
+    output sltKout,
+    output sltAnsOut,
     input a,
     input b,
     input[2:0] s,
-    input carryin
+    input addCarryIn,
+    input sltKin,
+    input sltAnsIn
 );
 
     wire[7:0] results;
 
 
-    fullAdder adder(results[0], carryout, a, b, carryin);
+    fullAdder adder(results[0], addCarryout, a, b, addCarryIn);
     `BUF(results[1], results[0]);
     `XOR(results[2], a, b);
-    `AND(results[3], results[2], b);
+    sltSlice slt(results[3], sltKout, sltAnsOut, sltKin, sltAnsIn, a, b);
     `AND(results[4], a, b);
     `NOT(results[5], results[4]);
     `NOT(results[6], results[7]);
@@ -71,32 +76,64 @@ endmodule
 
 module fullAdder(
    output out,
-   output carryout,
+   output addCarryout,
    input a,
    input b,
-   input carryin
+   input addCarryIn
 );
 
     wire AxorB, fullAnd, AandB;
 
     `XOR(AxorB, a, b);  // first level gates
     `AND(AandB, a, b);
-    `AND(fullAnd, carryin, AxorB);
+    `AND(fullAnd, addCarryIn, AxorB);
 
-    `XOR(out, AxorB, carryin);  // final gates
-    `XOR(carryout, AandB, fullAnd);
+    `XOR(out, AxorB, addCarryIn);  // final gates
+    `XOR(addCarryout, AandB, fullAnd);
 
 endmodule
 
+module sltSlice(
+    output out,
+    output keepLookingOut,
+    output ansOut,
+    input keepLookingIn,
+    input ansIn,
+    input a,
+    input b
+);
+
+    // keepLookingIn=1 if every previous bit pair has been equal.
+
+    // Keep looking if A and B are equal and we haven't already stopped looking
+    wire AxnorB;
+    `XNOR(AxnorB, a, b);
+    `AND(keepLookingOut, AxnorB, keepLookingIn);
+
+    // ansOut=1 if A=0 and B=1 and we haven't already stopped looking, or if
+    // we already determined ans=1.
+    wire notA;
+    wire notAandBandKin;
+    `NOT(notA, a);
+    `AND(notAandBandKin, notA, b, keepLookingIn);
+    `OR(ansOut, notAandBandKin, ansIn);
+
+    `BUF(out, 1'b0);
+
+endmodule
 
 module testBitSlice;
+
+
     reg a, b;
     reg[2:0] s;
-    reg carryin;
+    reg addCarryIn, sltKin, sltAnsIn;
     wire out;
-    wire carryout;
+    wire addCarryout, sltKout, sltAnsOut;
 
-    bitSlice slice (out, carryout, a, b, s, carryin);
+
+    bitSlice slice (out, addCarryout, sltKout, sltAnsOut, a, b, s, addCarryIn,
+                    sltKin, sltAnsIn);
 
     initial begin
         $dumpfile("slice.vcd"); //dump info to create wave propagation later
@@ -105,98 +142,104 @@ module testBitSlice;
         $display("ADD");
         $display("A B Cin Selector | out Cout | Expected");
         s=3'b000;
-        a=0; b=0; carryin=0; #1000
+        a=0; b=0; addCarryIn=0; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'b0);
-        a=1; b=1; carryin=0; #1000
+                 a, b, addCarryIn, s, out, addCarryout, 1'b0, 1'b0);
+        a=1; b=1; addCarryIn=0; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'b1);
-        a=1; b=1; carryin=1; #1000
+                 a, b, addCarryIn, s, out, addCarryout, 1'b0, 1'b1);
+        a=1; b=1; addCarryIn=1; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b1, 1'b1);
+                 a, b, addCarryIn, s, out, addCarryout, 1'b1, 1'b1);
 
         $display("");
         $display("XOR");
         $display("A B Cin Selector | out Cout | Expected");
         s=3'b010;
-        a=0; b=0; carryin=1'bx; #1000
+        a=0; b=0; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'bx);
-        a=0; b=1; carryin=1'bx; #1000
+                 a, b, addCarryIn, s, out, addCarryout, 1'b0, 1'bx);
+        a=0; b=1; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b1, 1'bx);
-        a=1; b=1; carryin=1'bx; #1000
+                 a, b, addCarryIn, s, out, addCarryout, 1'b1, 1'bx);
+        a=1; b=1; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'bx);
-
-        $display("");
-        $display("SLT");
-        $display("A B Cin Selector | out Cout | Expected");
-        s=3'b011;
-        a=0; b=1; carryin=1'bx; #1000
-        $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b1, 1'bx);
-        a=1; b=1; carryin=1'bx; #1000
-        $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'bx);
-        a=1; b=0; carryin=1'bx; #1000
-        $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'bx);
+                 a, b, addCarryIn, s, out, addCarryout, 1'b0, 1'bx);
 
         $display("");
         $display("AND");
         $display("A B Cin Selector | out Cout | Expected");
         s=3'b100;
-        a=0; b=1; carryin=1'bx; #1000
+        a=0; b=1; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'bx);
-        a=1; b=1; carryin=1'bx; #1000
+                 a, b, addCarryIn, s, out, addCarryout, 1'b0, 1'bx);
+        a=1; b=1; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b1, 1'bx);
-        a=0; b=0; carryin=1'bx; #1000
+                 a, b, addCarryIn, s, out, addCarryout, 1'b1, 1'bx);
+        a=0; b=0; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'bx);
+                 a, b, addCarryIn, s, out, addCarryout, 1'b0, 1'bx);
 
         $display("");
         $display("NAND");
         $display("A B Cin Selector | out Cout | Expected");
         s=3'b101;
-        a=0; b=1; carryin=1'bx; #1000
+        a=0; b=1; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b1, 1'bx);
-        a=1; b=1; carryin=1'bx; #1000
+                 a, b, addCarryIn, s, out, addCarryout, 1'b1, 1'bx);
+        a=1; b=1; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'bx);
-        a=0; b=0; carryin=1'bx; #1000
+                 a, b, addCarryIn, s, out, addCarryout, 1'b0, 1'bx);
+        a=0; b=0; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b1, 1'bx);
+                 a, b, addCarryIn, s, out, addCarryout, 1'b1, 1'bx);
 
         $display("");
         $display("NOR");
         $display("A B Cin Selector | out Cout | Expected");
         s=3'b110;
-        a=0; b=0; carryin=1'bx; #1000
+        a=0; b=0; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b1, 1'bx);
-        a=0; b=1; carryin=1'bx; #1000
+                 a, b, addCarryIn, s, out, addCarryout, 1'b1, 1'bx);
+        a=0; b=1; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'bx);
-        a=1; b=1; carryin=1'bx; #1000
+                 a, b, addCarryIn, s, out, addCarryout, 1'b0, 1'bx);
+        a=1; b=1; addCarryIn=1'bx; #1000
         $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'bx);
+                 a, b, addCarryIn, s, out, addCarryout, 1'b0, 1'bx);
 
         $display("");
         $display("OR");
-        $display("A B Cin Selector | out Cout | Expected");
+        $display("A B Selector | out | Expected");
         s=3'b111;
-        a=0; b=0; carryin=1'bx; #1000
-        $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b0, 1'bx);
-        a=0; b=1; carryin=1'bx; #1000
-        $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b1, 1'bx);
-        a=1; b=1; carryin=1'bx; #1000
-        $display("%b %b %b   %b      | %b   %b    | %b   %b",
-                 a, b, carryin, s, out, carryout, 1'b1, 1'bx);
+        a=0; b=0; addCarryIn=1'bx; #1000
+        $display("%b %b  %b     | %b   | %b ",
+                 a, b, s, out, 1'b0);
+        a=0; b=1; addCarryIn=1'bx; #1000
+        $display("%b %b  %b     | %b   | %b ",
+                 a, b, s, out, 1'b1);
+        a=1; b=1; addCarryIn=1'bx; #1000
+        $display("%b %b  %b     | %b   | %b ",
+                 a, b, s, out, 1'b1);
+
+        $display("");
+        $display("SLT");
+        $display("A B Kin AnsIn Selector | KOut AnsOut out | Expected");
+        s=3'b011;
+        a=0; b=1; sltKin=1; sltAnsIn=0; #1000
+        $display("%b %b %b   %b     %b      | %b    %b      %b   | %b %b %b",
+                 a, b, sltKin, sltAnsIn, s, sltKout, sltAnsOut, out, 1'b0, 1'b1, 1'b0);
+        a=1; b=0; sltKin=1; sltAnsIn=0; #1000
+        $display("%b %b %b   %b     %b      | %b    %b      %b   | %b %b %b",
+                 a, b, sltKin, sltAnsIn, s, sltKout, sltAnsOut, out, 1'b0, 1'b0, 1'b0);
+        a=1; b=1; sltKin=1; sltAnsIn=0; #1000
+        $display("%b %b %b   %b     %b      | %b    %b      %b   | %b %b %b",
+                 a, b, sltKin, sltAnsIn, s, sltKout, sltAnsOut, out, 1'b1, 1'b0, 1'b0);
+        a=1'bx; b=1'bx; sltKin=0; sltAnsIn=1; #1000
+        $display("%b %b %b   %b     %b      | %b    %b      %b   | %b %b %b",
+                 a, b, sltKin, sltAnsIn, s, sltKout, sltAnsOut, out, 1'b0, 1'b1, 1'b0);
+        a=1'bx; b=1'bx; sltKin=0; sltAnsIn=0; #1000
+        $display("%b %b %b   %b     %b      | %b    %b      %b   | %b %b %b",
+                 a, b, sltKin, sltAnsIn, s, sltKout, sltAnsOut, out, 1'b0, 1'b0, 1'b0);
     end
 endmodule
