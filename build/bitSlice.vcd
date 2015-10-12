@@ -1,0 +1,577 @@
+$date
+	Mon Oct 12 15:41:39 2015
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module testBitSlice $end
+$var wire 1 ! addCarryout $end
+$var wire 1 " out $end
+$var wire 1 # sltAnsOut $end
+$var wire 1 $ sltKout $end
+$var reg 1 % a $end
+$var reg 1 & addCarryIn $end
+$var reg 1 ' b $end
+$var reg 1 ( first $end
+$var reg 3 ) s [2:0] $end
+$var reg 1 * sltAnsIn $end
+$var reg 1 + sltKin $end
+$scope module slice $end
+$var wire 1 , a $end
+$var wire 1 - addCarryIn $end
+$var wire 1 ! addCarryout $end
+$var wire 1 . b $end
+$var wire 1 / first $end
+$var wire 1 " out $end
+$var wire 8 0 results [7:0] $end
+$var wire 3 1 s [2:0] $end
+$var wire 1 2 sltAnsIn $end
+$var wire 1 # sltAnsOut $end
+$var wire 1 3 sltKin $end
+$var wire 1 $ sltKout $end
+$scope module adder $end
+$var wire 1 4 AandB $end
+$var wire 1 5 AxorB $end
+$var wire 1 , a $end
+$var wire 1 - addCarryIn $end
+$var wire 1 ! addCarryout $end
+$var wire 1 . b $end
+$var wire 1 6 fullAnd $end
+$var wire 1 7 out $end
+$upscope $end
+$scope module slt $end
+$var wire 1 8 AxnorB $end
+$var wire 1 , a $end
+$var wire 1 2 ansIn $end
+$var wire 1 # ansOut $end
+$var wire 1 . b $end
+$var wire 1 / first $end
+$var wire 1 9 firstCase $end
+$var wire 1 3 keepLookingIn $end
+$var wire 1 $ keepLookingOut $end
+$var wire 1 : logicalKOut $end
+$var wire 1 ; notA $end
+$var wire 1 < notAandBandKin $end
+$var wire 1 = notFirst $end
+$var wire 1 > notFirstCase $end
+$var wire 1 ? out $end
+$upscope $end
+$scope module mux $end
+$var wire 3 @ address [2:0] $end
+$var wire 8 A in [7:0] $end
+$var wire 3 B naddress [2:0] $end
+$var wire 1 " out $end
+$var wire 8 C outputs [7:0] $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+bzx C
+bz B
+bzxxzzzxx A
+b0 @
+z?
+x>
+x=
+z<
+z;
+x:
+x9
+z8
+x7
+z6
+z5
+z4
+x3
+x2
+b0 1
+bzxxzzzxx 0
+x/
+0.
+0-
+0,
+x+
+x*
+b0 )
+x(
+0'
+0&
+0%
+x$
+x#
+x"
+x!
+$end
+#50
+b111 B
+b0x C
+0?
+0<
+18
+06
+04
+05
+b0xx000xx 0
+b0xx000xx A
+1;
+#100
+0!
+07
+b11000x0 0
+b11000x0 A
+#150
+b1100000 0
+b1100000 A
+b0 C
+#200
+0"
+#1000
+1'
+1.
+1%
+1,
+#1050
+x<
+b11110000 0
+b11110000 A
+14
+0;
+#1100
+b10010000 0
+b10010000 A
+1!
+0<
+#2000
+1&
+1-
+#2050
+17
+b10010001 0
+b10010001 A
+#2100
+b10010011 0
+b10010011 A
+b1 C
+#2150
+1"
+#3000
+0'
+0.
+0%
+0,
+b10 )
+b10 1
+b10 @
+x&
+x-
+#3050
+b101 B
+04
+1;
+x7
+b1x 0
+b1x A
+#3100
+b11000xx 0
+b11000xx A
+b0 C
+0!
+#3150
+0"
+#4000
+1'
+1.
+#4050
+b111001xx 0
+b111001xx A
+15
+08
+x<
+#4100
+b100 C
+b101001xx 0
+b101001xx A
+x6
+0:
+#4150
+1"
+x!
+0>
+#5000
+1%
+1,
+#5050
+b101100xx 0
+b101100xx A
+05
+14
+18
+0;
+#5100
+b0 C
+b100100xx 0
+b100100xx A
+06
+x:
+0<
+#5150
+0"
+1!
+x>
+#6000
+0%
+0,
+b100 )
+b100 1
+b100 @
+#6050
+b11 B
+b100001xx 0
+b100001xx A
+15
+04
+08
+1;
+#6100
+b101001xx 0
+b101001xx A
+x6
+0!
+0:
+x<
+#6150
+x!
+0>
+#7000
+1%
+1,
+#7050
+b101100xx 0
+b101100xx A
+05
+14
+18
+0;
+#7100
+b100100xx 0
+b100100xx A
+b10000 C
+06
+x:
+0<
+#7150
+1"
+1!
+x>
+#8000
+0'
+0.
+0%
+0,
+#8050
+b0xx 0
+b0xx A
+04
+1;
+#8100
+b0 C
+b11000xx 0
+b11000xx A
+0!
+#8150
+0"
+#9000
+1'
+1.
+b101 )
+b101 1
+b101 @
+#9050
+b10 B
+b100000 C
+b111001xx 0
+b111001xx A
+15
+08
+x<
+#9100
+1"
+b101001xx 0
+b101001xx A
+x6
+0:
+#9150
+x!
+0>
+#10000
+1%
+1,
+#10050
+b101100xx 0
+b101100xx A
+05
+14
+18
+0;
+#10100
+b100100xx 0
+b100100xx A
+06
+x:
+0<
+#10150
+b0 C
+1!
+x>
+#10200
+0"
+#11000
+0'
+0.
+0%
+0,
+#11050
+b0xx 0
+b0xx A
+04
+1;
+#11100
+b11000xx 0
+b11000xx A
+0!
+#11150
+b100000 C
+#11200
+1"
+#12000
+b110 )
+b110 1
+b110 @
+#12050
+b1 B
+b0 C
+#12100
+0"
+b1000000 C
+#12150
+1"
+#13000
+1'
+1.
+#13050
+b111001xx 0
+b111001xx A
+15
+08
+x<
+#13100
+b101001xx 0
+b101001xx A
+x6
+0:
+#13150
+b0 C
+x!
+0>
+#13200
+0"
+#14000
+1%
+1,
+#14050
+b101100xx 0
+b101100xx A
+05
+14
+18
+0;
+#14100
+b100100xx 0
+b100100xx A
+06
+x:
+0<
+#14150
+1!
+x>
+#15000
+0'
+0.
+0%
+0,
+b111 )
+b111 1
+b111 @
+#15050
+b0 B
+b10000000 C
+b0xx 0
+b0xx A
+04
+1;
+#15100
+1"
+b11000xx 0
+b11000xx A
+b0 C
+0!
+#15150
+0"
+#16000
+1'
+1.
+#16050
+b111001xx 0
+b111001xx A
+15
+08
+x<
+#16100
+b101001xx 0
+b101001xx A
+b10000000 C
+x6
+0:
+#16150
+1"
+x!
+0>
+#17000
+1%
+1,
+#17050
+b101100xx 0
+b101100xx A
+05
+14
+18
+0;
+#17100
+b100100xx 0
+b100100xx A
+06
+x:
+0<
+#17150
+1!
+x>
+#18000
+0*
+02
+1+
+13
+0%
+0,
+0(
+0/
+b11 )
+b11 1
+b11 @
+#18050
+b100 B
+b0 C
+0#
+1:
+b100001xx 0
+b100001xx A
+15
+04
+08
+1;
+1=
+09
+#18100
+0"
+b101001xx 0
+b101001xx A
+x6
+0!
+0:
+1<
+1>
+#18150
+x!
+0>
+1#
+1$
+#18200
+0$
+#19000
+0'
+0.
+1%
+1,
+#19050
+0<
+0;
+#19100
+0#
+#20000
+1'
+1.
+#20050
+b101100xx 0
+b101100xx A
+05
+14
+18
+#20100
+b100100xx 0
+b100100xx A
+06
+1:
+#20150
+1!
+1>
+#20200
+1$
+#21000
+1*
+12
+0+
+03
+x'
+x.
+x%
+x,
+#21050
+1#
+0:
+bx00x0xxx 0
+bx00x0xxx A
+x5
+x4
+x8
+x;
+#21100
+bx0xxx 0
+bx0xxx A
+0>
+x6
+x!
+#21150
+0$
+#22000
+0*
+02
+#22050
+0#
+#23000
+1*
+12
+1(
+1/
+#23050
+1#
+0=
+#24000
+0*
+02
+#24050
+0#
+#25000
