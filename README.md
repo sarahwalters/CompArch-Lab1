@@ -1,7 +1,7 @@
 # CompArch-Lab1
 
 To test bit slice:
-./build/bitSlice
+`./build/bitSlice`
 
 To test ALU:
-./build/alu
+`./build/alu`
