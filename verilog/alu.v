@@ -8,6 +8,8 @@ module ALU (
     input[2:0]      command
 );
 
+    wire[31:0] signedB;
+
     wire initialSltKin, initialSltAnsIn;
     `XNOR(initialSltKin, operandA[31], operandB[31]);
     `AND(initialSltAnsIn, operandA[31], initialSltKin);
@@ -33,7 +35,7 @@ module ALU (
     genvar i;
     generate
         for (i = 0; i < 32; i = i + 1) begin:FLIP
-            `XOR(operandB[i], shouldFlip, operandB[i]);
+            `XOR(signedB[i], shouldFlip, operandB[i]);
         end
     endgenerate
 
@@ -42,13 +44,13 @@ module ALU (
                 sltKouts[31],
                 sltAnsOuts[31],
                 operandA[31],
-                operandB[31],
+                signedB[31],
                 command,
                 addCarryouts[31 - 1],
                 initialSltKin,
                 initialSltAnsIn,
                 1'b1
-                );
+            );
 
     generate
         for (i = 1; i < 31; i = i + 1) begin:SLICE
@@ -57,7 +59,7 @@ module ALU (
                         sltKouts[i],
                         sltAnsOuts[i],
                         operandA[i],
-                        operandB[i],
+                        signedB[i],
                         command,
                         addCarryouts[i - 1],
                         sltKouts[i + 1],
