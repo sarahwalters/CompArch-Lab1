@@ -11,9 +11,9 @@ module ALU (
     wire[31:0] signedB;
 
     wire initialSltKin, initialSltAnsIn, bPositive;
-    `NOT(bPositive, operandB[31]);
-    `XNOR(initialSltKin, operandA[31], operandB[31]);
-    `AND(initialSltAnsIn, operandA[31], bPositive);
+    `NOT1(bPositive, operandB[31]);
+    `XNOR2(initialSltKin, operandA[31], operandB[31]);
+    `AND2(initialSltAnsIn, operandA[31], bPositive);
 
     wire[30:0] addCarryouts; // 31 bit is ALU carryout
     wire[31:0] sltKouts;
@@ -24,23 +24,23 @@ module ALU (
     wire[2:0] flipCommand;
 
     // only flip operandB if command is 3'b001 (subtraction)
-    `NOT(flipCommand[2], command[2]);
-    `NOT(flipCommand[1], command[1]);
-    `BUF(flipCommand[0], command[0]);
-    `AND(shouldFlip,
+    `NOT1(flipCommand[2], command[2]);
+    `NOT1(flipCommand[1], command[1]);
+    `BUF1(flipCommand[0], command[0]);
+    `AND3(shouldFlip,
             flipCommand[2],
             flipCommand[1],
             flipCommand[0]);
 
     // only set flags if we're adding/subtracting (command=00x)
     wire setFlags;
-    `NOR(setFlags, command[2], command[1]);
+    `NOR2(setFlags, command[2], command[1]);
 
     // flip the bits
     genvar i;
     generate
         for (i = 0; i < 32; i = i + 1) begin:FLIP
-            `XOR(signedB[i], shouldFlip, operandB[i]);
+            `XOR2(signedB[i], shouldFlip, operandB[i]);
         end
     endgenerate
 
@@ -60,7 +60,7 @@ module ALU (
                 1'b1
             );
 
-    `AND(carryout, isCarryout, setFlags);
+    `AND2(carryout, isCarryout, setFlags);
 
     generate
         for (i = 1; i < 31; i = i + 1) begin:SLICE
@@ -113,19 +113,18 @@ module ALU (
 
     // overflow circuit from lab0
     wire AxnB, BxS;
-    `XNOR(AxnB, operandA[31], signedB[31]); //Overflow: A == B and S !== B
-    `XOR(BxS, signedB[31], result[31]);
-    `AND(overflow, AxnB, BxS, setFlags);
+    `XNOR2(AxnB, operandA[31], signedB[31]); //Overflow: A == B and S !== B
+    `XOR2(BxS, signedB[31], result[31]);
+    `AND3(overflow, AxnB, BxS, setFlags);
 
     wire isZero;
-    `NOR(isZero, result[0], result[1], result[2], result[3], result[4],
+    `NOR32(isZero, result[0], result[1], result[2], result[3], result[4],
          result[5], result[6], result[7], result[8], result[9], result[10],
          result[11], result[12], result[13], result[14], result[15], result[16],
          result[17], result[18], result[19], result[20], result[21], result[22],
          result[23], result[24], result[25], result[26], result[27], result[28],
          result[29], result[30], result[31]);
 
-    `AND(zero, isZero, setFlags);
-
+    `AND2(zero, isZero, setFlags);
 
 endmodule
