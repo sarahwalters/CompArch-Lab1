@@ -10,9 +10,10 @@ module ALU (
 
     wire[31:0] signedB;
 
-    wire initialSltKin, initialSltAnsIn;
+    wire initialSltKin, initialSltAnsIn, bPositive;
+    `NOT(bPositive, operandB[31]);
     `XNOR(initialSltKin, operandA[31], operandB[31]);
-    `AND(initialSltAnsIn, operandA[31], initialSltKin);
+    `AND(initialSltAnsIn, operandA[31], bPositive);
 
     wire[30:0] addCarryouts; // 31 bit is ALU carryout
     wire[31:0] sltKouts;
@@ -78,18 +79,34 @@ module ALU (
         end
     endgenerate
 
-    bitSlice lsb(result[0],
+    wire lsbResult;
+    bitSlice lsb(lsbResult,
                 addCarryouts[0],
                 sltKouts[0],
                 sltAnsOuts[0],
                 operandA[0],
-                operandB[0],
+                signedB[0],
                 command,
                 command[0],
                 sltKouts[0 + 1],
                 sltAnsOuts[0 + 1],
                 1'b0
                 );
+
+    wire doingSLT, notDoingSLT, sltCaseAns, notSltCaseAns;
+    wire[2:0] isSLTCommand;
+
+    `NOT(isSLTCommand[2], command[2]);
+    `BUF(isSLTCommand[1], command[1]);
+    `BUF(isSLTCommand[0], command[0]);
+
+    `AND(doingSLT, isSLTCommand[0], isSLTCommand[1], isSLTCommand[2]);
+    `NOT(notDoingSLT, doingSLT);
+
+    `AND(sltCaseAns, doingSLT, sltAnsOuts[0]);
+    `AND(notSltCaseAns, notDoingSLT, lsbResult);
+
+    `OR(result[0], sltCaseAns, notSltCaseAns);
 
     // Addition flags if not set are 0. We're unsure if setting them to 0 or to
     // 1'bx is better practice.
