@@ -16,11 +16,11 @@ module sltSlice(
     `AND(logicalKOut, AxnorB, keepLookingIn);
 
     // Hand keepLookingIn straight through to keepLookingOut if first block
-    wire notFirst, notFirstCaseAns, firstCaseAns;
+    wire notFirst, notFirstCaseAns, firstCase;
     `NOT(notFirst, first);
-    `AND(notFirstCaseAns, notFirst, logicalKOut);
-    `AND(firstCaseAns, first, keepLookingIn);
-    `OR(keepLookingOut, notFirstCaseAns, firstCaseAns);
+    `AND(notFirstCase, notFirst, logicalKOut);
+    `AND(firstCase, first, keepLookingIn);
+    `OR(keepLookingOut, notFirstCaseAns, firstCase);
 
     // ansOut=1 if A=0 and B=1 and we haven't already stopped looking, or if
     // we already determined ans=1.

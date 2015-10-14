@@ -14,7 +14,7 @@ module testAlu;
         $display("Testing ALU");
 
         $display("A B command | result Cout zero overflow | Expected");
-        command=3'b000;
+        command=3'b111;
         operandA=32'b11111111111111111111111111111111; 
         operandB=32'b11111111111111111111111111111111; 
         #1000000
