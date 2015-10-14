@@ -5,3 +5,4 @@
 `define XOR xor #50
 `define XNOR xnor #50
 `define BUF buf #50
+`define NOR nor #50
