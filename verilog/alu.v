@@ -96,17 +96,17 @@ module ALU (
     wire doingSLT, notDoingSLT, sltCaseAns, notSltCaseAns;
     wire[2:0] isSLTCommand;
 
-    `NOT(isSLTCommand[2], command[2]);
-    `BUF(isSLTCommand[1], command[1]);
-    `BUF(isSLTCommand[0], command[0]);
+    `NOT1(isSLTCommand[2], command[2]);
+    `BUF1(isSLTCommand[1], command[1]);
+    `BUF1(isSLTCommand[0], command[0]);
 
-    `AND(doingSLT, isSLTCommand[0], isSLTCommand[1], isSLTCommand[2]);
-    `NOT(notDoingSLT, doingSLT);
+    `AND3(doingSLT, isSLTCommand[0], isSLTCommand[1], isSLTCommand[2]);
+    `NOT1(notDoingSLT, doingSLT);
 
-    `AND(sltCaseAns, doingSLT, sltAnsOuts[0]);
-    `AND(notSltCaseAns, notDoingSLT, lsbResult);
+    `AND2(sltCaseAns, doingSLT, sltAnsOuts[0]);
+    `AND2(notSltCaseAns, notDoingSLT, lsbResult);
 
-    `OR(result[0], sltCaseAns, notSltCaseAns);
+    `OR2(result[0], sltCaseAns, notSltCaseAns);
 
     // Addition flags if not set are 0. We're unsure if setting them to 0 or to
     // 1'bx is better practice.
