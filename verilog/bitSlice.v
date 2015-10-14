@@ -16,13 +16,13 @@ module bitSlice (
     wire[7:0] results;
 
     fullAdder adder(results[0], addCarryout, a, b, addCarryIn);
-    `BUF(results[1], results[0]);
-    `XOR(results[2], a, b);
+    `BUF1(results[1], results[0]);
+    `XOR2(results[2], a, b);
     sltSlice slt(results[3], sltKout, sltAnsOut, sltKin, sltAnsIn, a, b, first);
-    `AND(results[4], a, b);
-    `NOT(results[5], results[4]);
-    `NOT(results[6], results[7]);
-    `OR(results[7], a, b);
+    `AND2(results[4], a, b);
+    `NOT1(results[5], results[4]);
+    `NOT1(results[6], results[7]);
+    `OR2(results[7], a, b);
 
     multiplexer mux(out, s, results);
 

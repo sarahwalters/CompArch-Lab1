@@ -15,8 +15,8 @@ module testAlu;
 
         $display("A B command | result Cout zero overflow | Expected");
         command=3'b000;
-        operandA=32'b11111111111111111111111111111111; 
-        operandB=32'b11111111111111111111111111111111; 
+        operandA=32'b11111111111111111111111111111111;
+        operandB=32'b11111111111111111111111111111111;
         #1000000
         $display("%b %b %b      | %b   %b    | %b   %b",
                  operandA, operandB, command, result, carryout, 1'b0, 1'b0);
