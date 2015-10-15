@@ -1,1 +1,0 @@
-iverilog -o build/timing_compiled verilog/gates.v verilog/fullAdder.v verilog/multiplexer.v verilog/sltSlice.v verilog/bitSlice.v verilog/alu.v verilog/timing.v && ./build/timing_compiled
