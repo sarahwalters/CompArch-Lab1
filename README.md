@@ -107,13 +107,15 @@ Figure 4: Set less than logic design -- path with longest delay marked in red
 
 |                             | K<sub>out<sub>0</sub></sub> | Ans<sub>out<sub>0</sub></sub> | K<sub>out<sub>1</sub></sub> | Ans<sub>out<sub>1</sub></sub> | K<sub>out<sub>n</sub></sub> | Ans<sub>out<sub>n</sub></sub> |
 | --------------------------- |:---------------------------:| -----------------------------:|:---------------------------:| -----------------------------:|:---------------------------:| -----------------------------:|
-| K<sub>in<sub>0</sub></sub>  | 60                          | 70                            | 60+60                       | 70+30                         | 60(n)                       | 70+30(n-1)                    |
-| a[0]                        | 190                         | 80                            | 190+60                      | 80+30                         | 190+60(n-1)                 | 80+30(n-1)                    | 
-| b[0]                        | 190                         | 70                            | 190+60                      | 70+30                         | 190+60(n-1)                 | 70+30(n-1)                    |
-| Ans<sub>in<sub>0</sub></sub>| 30                          | n/a                           | 30+30                       | n/a                           | 30(n)                       | n/a                           |
+| K<sub>in<sub>0</sub></sub>  | 60                          | 70                            | 60+60                       | 70+30                         | 60+60(n)                    | 70+30(n)                      |
+| a[0]                        | 190                         | 80                            | 190+60                      | 80+30                         | 190+60(n)                   | 80+30(n)                      | 
+| b[0]                        | 190                         | 70                            | 190+60                      | 70+30                         | 190+60(n)                   | 70+30(n)                      |
+| Ans<sub>in<sub>0</sub></sub>| 30                          | n/a                           | 30+30                       | n/a                           | 30+30(n)                    | n/a                           |
 Table 1: Input to output delays for set less than portion of bitslice
 
-Table 1 describes the input to output delays for the set less than portion of a bitslice.
+Table 1 describes the input to output delays for the set less than portion of a bitslice. Indexing begins at the bit which experiences an input change, and the rightmost two colums of the table describe the delays at the outputs of the bit n to the right (LESS significant), because the set less than flags hand to the right.
+
+The longest delay possible is `190+60(31)=2050` units, and it occurs as follows: change the most significant bit of either operand and observe K<sub>out<sub>31</sub></sub>, which is the "keep looking" flag for the least significant bit.
 
 ##### Addition/subtraction
 ![Adder timing](/images/timing_adder.jpg)
@@ -121,12 +123,14 @@ Figure 5: Adder logic design -- path with longest delay marked in red
 
 |                | out<sub>0</sub> | C<sub>out<sub>0</sub></sub> | out<sub>0</sub> | C<sub>out<sub>0</sub></sub> | out<sub>n</sub> | C<sub>out<sub>n</sub></sub> |
 | ---------------|:---------------:| ---------------------------:|:---------------:| ---------------------------:|:---------------:| ---------------------------:|
-| C<sub>in</sub> | 110             | 140                         | 110+250         | 140+140                     | 110+250(n-1)    | 140(n)                      |
-| a              | 220             | 250                         | 220+250         | 250+140                     | 220+250(n-1)    | 250+140(n-1)                |
-| b              | 220             | 250                         | 220+250         | 250+140                     | 220+250(n-1)    | 250+140(n-1)                |
+| C<sub>in</sub> | 110             | 140                         | 110+140         | 140+140                     | 110+140(n)      | 140+140(n)                  |
+| a              | 220             | 250                         | 110+250         | 250+140                     | 110+140(n-1)+250| 250+140(n)                  |
+| b              | 220             | 250                         | 110+250         | 250+140                     | 110+140(n-1)+250| 250+140(n)                  |
 Table 2: Input to output delays for addition/subtraction portion of bitslice
 
-Again, the longest path within the addition/subtraction block is marked in red -- cahnging either operand bit (a or b) results in a 250-unit delay before C<sub>out</sub> changes.  
+Table 2 describes the input to output delays for the addition/subtraction portion of a bitslice. Once again, indexing begins at the bit which experiences an input change. However, in this case the rightmost two colums of the table describe the delays at the outputs of the bit n to the left (MORE significant) -- the adding carryouts hand to the left, not to the right.
+
+The longest delay possible is `250+140(31)=4590` units, and it occurs as follows: change the least significant bit of either operand and observe C<sub>out<sub>31</sub></sub>, which is the carryout flag for the most significant bit.
 
 ### Simulated worst case propagation delay:
 
