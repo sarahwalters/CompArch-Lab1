@@ -96,8 +96,6 @@ Our third mistake was caught when testing SLT. The SLT operation works by first 
 
 ## Timing Analysis
 ### Calculated worst case propagation delay:
-SLT: `60*32 = 1920`
-Adder/subtractor: `250 + 31*110 = 3660`
 
 The worst case propagation delay occurs in either the set less than operation or the addition/subtraction operation -- those operations occur in series (each bitslice uses information produced by an adjacent bitslice). By contrast, operations like `OR` and `AND` occur within each bitslice without dependence on any other bitslice.
 
@@ -107,25 +105,25 @@ We examine the set less than and addition blocks to determine which takes longer
 ![SLT timing](/images/timing_slt.jpg)
 Figure 4: Set less than logic design -- path with longest delay marked in red
 
-|                   | K<sub>out</sub> | Ans<sub>out</sub> |
-| ----------------- |:---------------:| -----------------:|
-| K<sub>in</sub>    | 60              | 70                |
-| a                 | 190             | 80                |
-| b                 | 190             | 70                |
-| Ans<sub>in</sub>  | n/a             | 30                |
+|                             | K<sub>out<sub>0</sub></sub> | Ans<sub>out<sub>0</sub></sub> | K<sub>out<sub>1</sub></sub> | Ans<sub>out<sub>1</sub></sub> | K<sub>out<sub>n</sub></sub> | Ans<sub>out<sub>n</sub></sub> |
+| --------------------------- |:---------------------------:| -----------------------------:|:---------------------------:| -----------------------------:|:---------------------------:| -----------------------------:|
+| K<sub>in<sub>0</sub></sub>  | 60                          | 70                            | 60+60                       | 70+30                         | 60(n)                       | 70+30(n-1)                    |
+| a[0]                        | 190                         | 80                            | 190+60                      | 80+30                         | 190+60(n-1)                 | 80+30(n-1)                    | 
+| b[0]                        | 190                         | 70                            | 190+60                      | 70+30                         | 190+60(n-1)                 | 70+30(n-1)                    |
+| Ans<sub>in<sub>0</sub></sub>| 30                          | n/a                           | 30+30                       | n/a                           | 30(n)                       | n/a                           |
 Table 1: Input to output delays for set less than portion of bitslice
 
-Table 1 describes the input to output delays for the set less than portion of a bitslice. The longest path is marked in red in Figure 4 -- changing either operand bit (a or b) results in a 190-unit delay before K<sub>out</sub> changes.  
+Table 1 describes the input to output delays for the set less than portion of a bitslice.
 
 ##### Addition/subtraction
 ![Adder timing](/images/timing_adder.jpg)
 Figure 5: Adder logic design -- path with longest delay marked in red
 
-|                   | out  | C<sub>out</sub>   |
-| ----------------- |:----:| -----------------:|
-| C<sub>in</sub>    | 110  | 140               |
-| a                 | 220  | 250               |
-| b                 | 220  | 250               |
+|                | out<sub>0</sub> | C<sub>out<sub>0</sub></sub> | out<sub>0</sub> | C<sub>out<sub>0</sub></sub> | out<sub>n</sub> | C<sub>out<sub>n</sub></sub> |
+| ---------------|:---------------:| ---------------------------:|:---------------:| ---------------------------:|:---------------:| ---------------------------:|
+| C<sub>in</sub> | 110             | 140                         | 110+250         | 140+140                     | 110+250(n-1)    | 140(n)                      |
+| a              | 220             | 250                         | 220+250         | 250+140                     | 220+250(n-1)    | 250+140(n-1)                |
+| b              | 220             | 250                         | 220+250         | 250+140                     | 220+250(n-1)    | 250+140(n-1)                |
 Table 2: Input to output delays for addition/subtraction portion of bitslice
 
 Again, the longest path within the addition/subtraction block is marked in red -- cahnging either operand bit (a or b) results in a 250-unit delay before C<sub>out</sub> changes.  
