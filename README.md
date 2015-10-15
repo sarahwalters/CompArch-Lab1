@@ -112,7 +112,7 @@ Figure 4: Set less than logic design -- path with longest delay marked in red
 | K<sub>in</sub>    | 60              | 70                |
 | a                 | 190             | 80                |
 | b                 | 190             | 70                |
-| Ans<sub>in</sub>  | 30              | n/a               |
+| Ans<sub>in</sub>  | n/a             | 30                |
 Table 1: Input to output delays for set less than portion of bitslice
 
 Table 1 describes the input to output delays for the set less than portion of a bitslice. The longest path is marked in red in Figure 4 -- changing either operand bit (a or b) results in a 190-unit delay before K<sub>out</sub> changes.  
